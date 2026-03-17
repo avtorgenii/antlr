@@ -36,12 +36,33 @@ public interface ExprParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStatement(ExprParser.StatementContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code PrintStat}
+	 * labeled alternative in {@link ExprParser#stat}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPrintStat(ExprParser.PrintStatContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code IfStat}
 	 * labeled alternative in {@link ExprParser#stat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitIfStat(ExprParser.IfStatContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ReturnStat}
+	 * labeled alternative in {@link ExprParser#stat}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitReturnStat(ExprParser.ReturnStatContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ForStat}
+	 * labeled alternative in {@link ExprParser#stat}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForStat(ExprParser.ForStatContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code BlockSingle}
 	 * labeled alternative in {@link ExprParser#block}.
@@ -69,6 +90,13 @@ public interface ExprParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitFloatLit(ExprParser.FloatLitContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code FunCall}
+	 * labeled alternative in {@link ExprParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunCall(ExprParser.FunCallContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code Parens}
 	 * labeled alternative in {@link ExprParser#expr}.
@@ -118,10 +146,4 @@ public interface ExprParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitStringLit(ExprParser.StringLitContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link ExprParser#func}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFunc(ExprParser.FuncContext ctx);
 }
