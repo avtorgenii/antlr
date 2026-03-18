@@ -1,13 +1,15 @@
 lexer grammar ExprLexer;
 
-// Ключевые слова (Типы)
+// Ключевые слова и тип)
 INT_TYPE    : 'int' ;
 FLOAT_TYPE  : 'float' ;
 BOOL_TYPE   : 'bool' ;
 STRING_TYPE : 'string' ;
+
 IF_kw  : 'if';
 ELSE_kw : 'else' ;
 PRINT_kw : 'print' | 'DATTEBAYO' ;
+READ_kw  : 'read' | 'ZAWARUDO';
 RETURN_kw : 'return' ;
 FOR_kw : 'for' ;
 

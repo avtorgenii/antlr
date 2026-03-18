@@ -19,10 +19,11 @@ block: stat             #BlockSingle
     | '{' stat* '}'     #BlockReal
     ;
 
-def : name=ID '(' par+=ID (',' par+=ID)* ')' '{' body+=stat* '}' ;  // function deinition and arguments, += means add, = would mean only the last stat
+def : name=ID '(' par+=ID? (',' par+=ID)* ')' '{' body+=stat* '}' ;  // function deinition and arguments, += means add, = would mean only the last stat
 
 // в ExprContext будет пусто, так как тут есть лейблы (#BinOp и тд.), зато появяться новые контексты (ExprParser.BinOpContext и др.)
-expr: ID '(' expr (',' expr)* ')'                       #FunCall
+expr: ID '(' expr? (',' expr)* ')'                      #FunCall
+    | READ_kw expr                                      #ReadCall
     | l=expr op=(MUL|DIV) r=expr                        #BinOp            // l, op и r появяться как полня контекста BinOpContext
     | l=expr op=(ADD|SUB) r=expr                        #BinOp
     | l=expr op=(EQUAL|NOTEQUAL|GT|LT|GE|LE) r=expr     #BinOp
@@ -31,6 +32,5 @@ expr: ID '(' expr (',' expr)* ')'                       #FunCall
     | STRING                                            #StringLit
     | BOOL                                              #BoolLit
     | ID                                                #Id
-    | '(' expr ')'                                      #Parens
     | <assoc=right> ID ASSIGN expr                      #Assign           // Магия здесь: y = 5 теперь валидный expr
     ;

@@ -1,4 +1,4 @@
-// Generated from /home/avtor/dev/antlr-lab/antlr_lab_1/src/ExprParser.g4 by ANTLR 4.13.2
+// Generated from C:/Users/ashes/dev/antlr/antlr_lab_1/src/ExprParser.g4 by ANTLR 4.13.2
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -98,12 +98,12 @@ public interface ExprParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFunCall(ExprParser.FunCallContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code Parens}
+	 * Visit a parse tree produced by the {@code ReadCall}
 	 * labeled alternative in {@link ExprParser#expr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitParens(ExprParser.ParensContext ctx);
+	T visitReadCall(ExprParser.ReadCallContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code Assign}
 	 * labeled alternative in {@link ExprParser#expr}.

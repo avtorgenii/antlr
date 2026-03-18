@@ -1,41 +1,25 @@
-/*
-int x = 0;
-
-if (1 == 1){
-    x = 1;
-
-    print "Alham";
-
-    if (1) int y = 5;
-}
-else {
-    x = 2;
-}
-
-func (x) {
+func () {
     print "1000-7?";
-    bool a = x == 1;
-    print a;
+    bool a = 1;
+    print 2;
+    return 5;
 }
 
-func (1);
+int x = func ();
+
+print x;
+
+string input = read "BAKA!";
+print input;
 
 
-check (n) {
-    if (n > 10) {
-        return "Big";
-    }
-    return "Small";
+paramful (x, y, z) {
+    print x;
+    print y;
+    print z;
 }
 
-print check(15);
+paramful (1, 2, 3);
 
-*/
-int result = 0;
 
-for (int i = 1; i <= 5; i = i + 1) {
-    result = result + 1;
-    print "Step " + i + ", result: " + result;
-}
-
-print "Final Sum: " + result;
+paramful (1, 2);

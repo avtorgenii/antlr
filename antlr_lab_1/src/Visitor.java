@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 
 public class Visitor extends ExprParserBaseVisitor<Object> {
@@ -13,16 +14,14 @@ public class Visitor extends ExprParserBaseVisitor<Object> {
     // visit() - заставляет программу спуститься глубже в дерево разбора и выполнить там соответствующую логику. Вызывает нужную функцию из определенных судя по типу ctx
     @Override
     public Object visitProgram(ExprParser.ProgramContext ctx) {
-        // 1. Сначала собираем все определения функций
+        // Сначала собираем все определения функций
         for (ExprParser.DefContext dContext : ctx.def()) {
-            // Вызов visit(dContext) должен сохранять функцию в Map
             visit(dContext);
         }
 
-        // 2. Затем по порядку выполняем все инструкции (stat)
+        // Затем по порядку выполняем все stat
         for (ExprParser.StatContext sContext : ctx.stat()) {
             Object result = visit(sContext);
-            print("Read statement, result: " + result);
         }
 
         return "Omae wa mou shindeiru";
@@ -52,29 +51,29 @@ public class Visitor extends ExprParserBaseVisitor<Object> {
     @Override
     public Object visitBlockSingle(ExprParser.BlockSingleContext ctx) {
         // Если в блоке одна строка без скобок - просто выполняем её
-        return visit(ctx.stat());
+        visit(ctx.stat());
+        return null;
     }
 
     @Override
     public Object visitBlockReal(ExprParser.BlockRealContext ctx) {
         memory.enterScope();
-        Object res = null;
         try {
             for (ExprParser.StatContext s : ctx.stat()) {
-                res = visit(s);
+                visit(s);
             }
         } finally {
             memory.leaveScope();
         }
-        return res;
+        return null;
     }
 
     @Override
     public Object visitIfStat(ExprParser.IfStatContext ctx) {
-        // 1. Вычисляем условие в скобках
+        // Вычисляем условие в скобках
         Object condition = visit(ctx.cond);
 
-        // 2. Проверяем, истинно ли оно (нужно привести к Boolean)
+        // Проверяем, истинно ли оно (нужно привести к Boolean)
         if (isTrue(condition)) {
             // Выполняем ветку 'then'
             return visit(ctx.then);
@@ -97,14 +96,11 @@ public class Visitor extends ExprParserBaseVisitor<Object> {
     // Print
     @Override
     public Object visitPrintStat(ExprParser.PrintStatContext ctx) {
-        // 1. Вычисляем то, что стоит после слова print
+        // Вычисляем то, что стоит после слова print
         Object value = visit(ctx.expr());
 
-        // 2. Выводим в консоль
-        // Можно использовать твой внутренний метод print() или сразу System.out
-        System.out.println("> " + value);
+        print("> " + value);
 
-        // Возвращаем само значение (хороший тон для интерпретаторов)
         return value;
     }
 
@@ -161,6 +157,19 @@ public class Visitor extends ExprParserBaseVisitor<Object> {
     }
 
     @Override
+    public Object visitReadCall(ExprParser.ReadCallContext ctx) {
+        Scanner scanner = new Scanner(System.in);
+
+        Object readText = visit(ctx.expr());
+
+        print(readText);
+        Object result = scanner.nextLine();
+
+        scanner.close();
+        return result;
+    }
+
+    @Override
     public Object visitBinOp(ExprParser.BinOpContext ctx) {
         Object left = visit(ctx.l);
         Object right = visit(ctx.r);
@@ -172,7 +181,7 @@ public class Visitor extends ExprParserBaseVisitor<Object> {
 
         int tokenType = ctx.op.getType();
 
-        // 1. СРАВНЕНИЕ И РАВЕНСТВО
+        // СРАВНЕНИЕ И РАВЕНСТВО
         if (tokenType == ExprLexer.EQUAL || tokenType == ExprLexer.NOTEQUAL ||
                 tokenType == ExprLexer.GT || tokenType == ExprLexer.LT ||
                 tokenType == ExprLexer.GE || tokenType == ExprLexer.LE) {
@@ -196,7 +205,7 @@ public class Visitor extends ExprParserBaseVisitor<Object> {
             if (tokenType == ExprLexer.NOTEQUAL) return !left.equals(right);
         }
 
-        // 2. АРИФМЕТИКА
+        // АРИФМЕТИКА
         if (left instanceof Number && right instanceof Number) {
             boolean isFloat = (left instanceof Float || right instanceof Float);
             float l = ((Number) left).floatValue();
@@ -215,12 +224,12 @@ public class Visitor extends ExprParserBaseVisitor<Object> {
             if (res != null) return res;
         }
 
-        // 3. КОНКАТЕНАЦИЯ
+        // КОНКАТЕНАЦИЯ
         if (tokenType == ExprLexer.ADD && (left instanceof String || right instanceof String)) {
             return String.valueOf(left) + String.valueOf(right);
         }
 
-        // 4. ЛОГИКА
+        // ЛОГИКА
         if (left instanceof Boolean && right instanceof Boolean) {
             boolean l = (Boolean) left;
             boolean r = (Boolean) right;
@@ -235,7 +244,6 @@ public class Visitor extends ExprParserBaseVisitor<Object> {
     }
 
     // ##### FUNCTIONS STUFF #####
-
     @Override
     public Object visitReturnStat(ExprParser.ReturnStatContext ctx) {
         Object value = null;
@@ -250,7 +258,6 @@ public class Visitor extends ExprParserBaseVisitor<Object> {
     public Object visitDef(ExprParser.DefContext ctx) {
         String name = ctx.name.getText();
         functionManager.register(name, ctx);
-        System.out.println("Read func definition: " + name);
         return null;
     }
 
@@ -263,7 +270,7 @@ public class Visitor extends ExprParserBaseVisitor<Object> {
             throw new RuntimeException("Функция " + name + " не определена!");
         }
 
-        // 1. Вычисляем аргументы в ТЕКУЩЕМ скоупе (до входа в функцию)
+        // Вычисляем аргументы в ТЕКУЩЕМ скоупе (до входа в функцию)
         List<Object> actualArgs = new ArrayList<>();
         if (ctx.expr() != null) {
             for (ExprParser.ExprContext expr : ctx.expr()) {
@@ -271,23 +278,22 @@ public class Visitor extends ExprParserBaseVisitor<Object> {
             }
         }
 
-        // 2. С помощью менеджера создаем новый скоуп и биндим параметры
+        // С помощью менеджера создаем новый скоуп и биндим параметры
         functionManager.prepareScope(def, actualArgs);
 
-        // 3. Выполняем тело функции
-        Object result = null;
+        // Выполняем тело функции
         try {
             for (ExprParser.StatContext s : def.body) {
-                result = visit(s);
+                visit(s);
             }
         } catch (ReturnException e) {
-            // Если внутри сработал return — возвращаем его значение
+            // Если внутри сработал return - возвращаем его значение
             return e.getValue();
         } finally {
-            // 4. Обязательно покидаем скоуп, даже если произошла ошибка
+            // Обязательно покидаем скоуп, даже если произошла ошибка
             memory.leaveScope();
         }
 
-        return result;
+        return null;
     }
 }
