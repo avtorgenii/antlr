@@ -1,0 +1,25 @@
+func () {
+    print "1000-7?";
+    bool a = 1;
+    print 2;
+    return 5;
+}
+
+int x = func ();
+
+print x;
+
+string input = read "BAKA!";
+print input;
+
+
+paramful (x, y, z) {
+    print x;
+    print y;
+    print z;
+}
+
+paramful (1, 2, 3);
+
+
+paramful (1, 2);
