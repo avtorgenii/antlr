@@ -41,9 +41,23 @@ public class EmitVisitor extends ExprParserBaseVisitor<ST> {
     // ##### STATS #####
     @Override
     public ST visitDeclare(ExprParser.DeclareContext ctx) {
-        ST st = stGroup.getInstanceOf("decl");
-        st.add("n", visit(ctx.expr()));
-        return super.visitDeclare(ctx);
+        String varName = ctx.ID().getText();
+
+        // 1. Создаем декларацию: DD a
+        ST decl = stGroup.getInstanceOf("decl");
+        decl.add("n", varName);
+
+        // 2. Если в строке есть присваивание (например, = 2)
+        if (ctx.expr() != null) {
+            ST init = stGroup.getInstanceOf("assign");
+            init.add("v", visit(ctx.expr())); // Тут будет PUSH #2
+            init.add("n", varName);
+
+            // Склеиваем: сначала объявили, потом положили значение
+            decl.add("n", varName + "\n" + init.render());
+        }
+
+        return decl;
     }
 
 

@@ -1,6 +1,6 @@
 lexer grammar ExprLexer;
 
-// Ключевые слова и тип)
+// Типы
 INT_TYPE    : 'int' ;
 FLOAT_TYPE  : 'float' ;
 BOOL_TYPE   : 'bool' ;
