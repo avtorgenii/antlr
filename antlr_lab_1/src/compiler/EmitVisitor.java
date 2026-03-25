@@ -45,7 +45,6 @@ public class EmitVisitor extends ExprParserBaseVisitor<ST> {
 
         // 1. Создаем декларацию: DD a
         ST decl = stGroup.getInstanceOf("decl");
-        decl.add("n", varName);
 
         // 2. Если в строке есть присваивание (например, = 2)
         if (ctx.expr() != null) {
@@ -55,6 +54,8 @@ public class EmitVisitor extends ExprParserBaseVisitor<ST> {
 
             // Склеиваем: сначала объявили, потом положили значение
             decl.add("n", varName + "\n" + init.render());
+        } else {
+            decl.add("n", varName);
         }
 
         return decl;

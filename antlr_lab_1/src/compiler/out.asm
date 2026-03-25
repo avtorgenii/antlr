@@ -1,19 +1,25 @@
-    DD aa
+    DD a
     PUSH #2
+    PUSH #3
+    ADD
     DUP
     POP [a]
-        PUSH #L_TRUE_0  // 1. Кладем номер строки. Стек: [L_TRUE]
-        PUSH [a]
-        PUSH #2
-        SUB        // 2. Вычисляем. Команды sub положат результат СВЕРХУ. Стек: [L_TRUE, результат]
-        JG                   // 3. JG забирает результат (верхний), потом L_TRUE (под ним)
-
-        PUSH #0
-        PUSH #L_END_0
-        JMP
-
-        L_TRUE_0:
-        PUSH #1
-        L_END_0:
-        Terminal node:;
+    DD b
+    PUSH [a]
+    PUSH #5
+    DIV
+    DUP
+    POP [b]
+    DD c
+    PUSH [a]
+    PUSH [b]
+    MUL
+    DUP
+    POP [c]
+    DD d
+    PUSH [a]
+    PUSH [c]
+    SUB
+    DUP
+    POP [d]
     Terminal node:<EOF>

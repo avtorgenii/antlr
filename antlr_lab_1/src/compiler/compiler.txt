@@ -1,2 +1,4 @@
-int a = 2;
-a > 2;
+int a = 2 + 3;
+int b = a / 5;
+int c = a * b;
+int d = a - c;
