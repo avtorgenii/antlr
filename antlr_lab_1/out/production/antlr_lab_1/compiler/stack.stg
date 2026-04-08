@@ -56,12 +56,12 @@ DIV
 
 // Прыжковые команды (JMP, JG, JE) всегда ждут в стеке НОМЕР СТРОКИ (адрес), а не то, что на этой строке написано.
 // Шаблон для "Больше чем" (a > b)
-// 1. Кладем номер строки. Стек: [L_TRUE]
-// 2. Вычисляем. Команды sub положат результат СВЕРХУ. Стек: [L_TRUE, результат]
-// 3. JG забирает результат (верхний), потом L_TRUE (под ним)
+// 1. Вычисляем.
+// 2. Кладем номер строки. Стек: [результат, L_TRUE]
+// 3. JG забирает L_TRUE (верхний), потом результат (под ним)
 gt(p1, p2, addr) ::= <<
-PUSH #L_TRUE_<addr>
 <sub(p1, p2)>
+PUSH #L_TRUE_<addr>
 JG
 
 PUSH #0
@@ -70,5 +70,24 @@ JMP
 
 L_TRUE_<addr>:
 PUSH #1
+
 L_END_<addr>:
+>>
+
+// ##### FUNCTIONS #####
+pop_param(n) ::= "POP [<n>]"
+
+// Определение функции
+func_def(name, params_decl, params_init, body) ::= <<
+<name>:
+    <params_decl; separator="\n">
+    <params_init; separator="\n">
+    <body>
+    RET
+>>
+
+// Вызов функции
+call(name, args) ::= <<
+<args; separator="\n">
+CALL <name>
 >>

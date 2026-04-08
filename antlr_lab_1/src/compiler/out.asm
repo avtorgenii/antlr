@@ -1,25 +1,17 @@
-    DD a
-    PUSH #2
-    PUSH #3
-    ADD
-    DUP
-    POP [a]
-    DD b
-    PUSH [a]
-    PUSH #5
-    DIV
-    DUP
-    POP [b]
-    DD c
-    PUSH [a]
-    PUSH [b]
-    MUL
-    DUP
-    POP [c]
-    DD d
-    PUSH [a]
-    PUSH [c]
-    SUB
-    DUP
-    POP [d]
+    alham:
+        DD a
+        DD b
+        POP [b]
+        POP [a]
+        DD c
+        PUSH [a]
+        PUSH [b]
+        ADD
+        DUP
+        POP [c]
+        RET
+        PUSH #3
+        PUSH #5
+        CALL alham
+        Terminal node:;
     Terminal node:<EOF>

@@ -1,11 +1,14 @@
 package compiler;
 
 import grammar.ExprParserBaseVisitor;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import grammar.ExprLexer;
 import grammar.ExprParser;
+
+import java.util.List;
 
 public class EmitVisitor extends ExprParserBaseVisitor<ST> {
     private final STGroup stGroup;
@@ -124,4 +127,55 @@ public class EmitVisitor extends ExprParserBaseVisitor<ST> {
 
         return st;
     }
+
+
+    // ##### FUNCTION STUFF #####
+    @Override
+    public ST visitDef(ExprParser.DefContext ctx) {
+        ST func = stGroup.getInstanceOf("func_def");
+        func.add("name", ctx.name.getText());
+
+        if (ctx.par != null && !ctx.par.isEmpty()) {
+            List<Token> parameters = ctx.par;
+
+            // First pass: declare all parameters with DD
+            for (Token param : parameters) {
+                ST decl = stGroup.getInstanceOf("decl");
+                decl.add("n", param.getText());
+                func.add("params_decl", decl);
+            }
+
+            // Second pass: POP values from stack (reverse order, last arg on top)
+            for (int i = parameters.size() - 1; i >= 0; i--) {
+                ST pop = stGroup.getInstanceOf("pop_param");
+                pop.add("n", parameters.get(i).getText());
+                func.add("params_init", pop);
+            }
+        }
+
+        for (ExprParser.StatContext stat : ctx.body) {
+            func.add("body", visit(stat));
+        }
+
+        return func;
+    }
+
+    @Override
+    public ST visitFunCall(ExprParser.FunCallContext ctx) {
+        ST call = stGroup.getInstanceOf("call");
+
+        // Здесь ID только один (имя вызываемой функции)
+        call.add("name", ctx.ID().getText());
+
+        // А вот выражений (аргументов) может быть много
+        // В правиле expr : ID '(' expr? (',' expr)* ')'
+        // ANTLR создаст метод expr(), возвращающий List<ExprContext>
+        for (ExprParser.ExprContext exprCtx : ctx.expr()) {
+            call.add("args", visit(exprCtx));
+        }
+
+        return call;
+    }
 }
+
+
