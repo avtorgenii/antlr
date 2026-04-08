@@ -1,8 +1,11 @@
 group first;
 
 // Контейнер для всех инструкций
-deflt(elem) ::= <<
-    <elem; separator="\n">
+program(defs, stats) ::= <<
+<defs; separator="\n">
+
+start:
+<stats; separator="\n">
 >>
 
 // Загрузка константы
@@ -86,8 +89,12 @@ func_def(name, params_decl, params_init, body) ::= <<
     RET
 >>
 
+// Нужна для реестровой машине - тут просто заглушка
+push_arg(v) ::= "<v>"
+
 // Вызов функции
 call(name, args) ::= <<
 <args; separator="\n">
-CALL <name>
+PUSH #<name>
+CALL
 >>

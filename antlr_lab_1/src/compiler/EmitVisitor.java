@@ -23,22 +23,43 @@ public class EmitVisitor extends ExprParserBaseVisitor<ST> {
         return labelCounter++;
     }
 
-    @Override
-    protected ST defaultResult() {
-        return stGroup.getInstanceOf("deflt");
-    }
-
-    // Когда визитор обходит список инструкций в программе, он получает результат для каждой строки (nextResult) и кладет его в ведро
-    @Override
-    protected ST aggregateResult(ST aggregate, ST nextResult) {
-        if (nextResult != null) aggregate.add("elem", nextResult);
-        return aggregate;
-    }
+//    @Override
+//    protected ST defaultResult() {
+//        return stGroup.getInstanceOf("deflt");
+//    }
+//
+//    // Когда визитор обходит список инструкций в программе, он получает результат для каждой строки (nextResult) и кладет его в ведро
+//    @Override
+//    protected ST aggregateResult(ST aggregate, ST nextResult) {
+//        if (nextResult != null) aggregate.add("elem", nextResult);
+//        return aggregate;
+//    }
 
     // Этот метод срабатывает на КАЖДЫЙ символ, который не является правилом
     @Override
     public ST visitTerminal(TerminalNode node) {
-        return new ST("Terminal node:<n>").add("n", node.getText());
+        return null;
+    }
+
+    @Override
+    public ST visitProgram(ExprParser.ProgramContext ctx) {
+        ST program = stGroup.getInstanceOf("program");
+
+        // First pass: emit all function definitions
+        for (var child : ctx.children) {
+            if (child instanceof ExprParser.DefContext) {
+                program.add("defs", visit(child));
+            }
+        }
+
+        // Second pass: emit all top-level statements
+        for (var child : ctx.children) {
+            if (child instanceof ExprParser.StatContext) {
+                program.add("stats", visit(child));
+            }
+        }
+
+        return program;
     }
 
     // ##### STATS #####
@@ -64,6 +85,11 @@ public class EmitVisitor extends ExprParserBaseVisitor<ST> {
         return decl;
     }
 
+
+    @Override
+    public ST visitStatement(ExprParser.StatementContext ctx) {
+        return visit(ctx.expr());
+    }
 
     // ##### EXPRESSIONS #####
     @Override
@@ -163,15 +189,12 @@ public class EmitVisitor extends ExprParserBaseVisitor<ST> {
     @Override
     public ST visitFunCall(ExprParser.FunCallContext ctx) {
         ST call = stGroup.getInstanceOf("call");
-
-        // Здесь ID только один (имя вызываемой функции)
         call.add("name", ctx.ID().getText());
 
-        // А вот выражений (аргументов) может быть много
-        // В правиле expr : ID '(' expr? (',' expr)* ')'
-        // ANTLR создаст метод expr(), возвращающий List<ExprContext>
         for (ExprParser.ExprContext exprCtx : ctx.expr()) {
-            call.add("args", visit(exprCtx));
+            ST pushArg = stGroup.getInstanceOf("push_arg");
+            pushArg.add("v", visit(exprCtx));
+            call.add("args", pushArg);
         }
 
         return call;

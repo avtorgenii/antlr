@@ -1,8 +1,11 @@
 group first;
 
 // Контейнер для всех инструкций
-deflt(elem) ::= <<
-<elem; separator="\n">
+program(defs, stats) ::= <<
+<defs; separator="\n">
+
+start:
+<stats; separator="\n">
 >>
 
 // Загрузка константы в главный регистр A
@@ -78,4 +81,40 @@ L_TRUE_<addr>:
 
 MOV A, #1
 L_END_<addr>:
+>>
+
+// ##### FUNCTIONS #####
+pop_param(n) ::= <<
+POP A
+MOV [<n>], A
+>>
+
+// Определение функции
+func_def(name, params_decl, params_init, body) ::= <<
+<name>:
+    DD _ret_<name>
+    POP A
+    MOV [_ret_<name>], A
+    <params_decl; separator="\n">
+    <params_init; separator="\n">
+    <body>
+    MOV A, [_ret_<name>]
+    PUSH A
+    RET
+>>
+
+
+// Аргументы пушим через A
+push_arg(v) ::= <<
+<v>
+PUSH A
+>>
+
+// Вызов функции
+// CALL делает две вещи:
+// Кладёт на стек PC+1 — адрес следующей инструкции (куда вернуться)
+// Прыгает на этикетку функции
+call(name, args) ::= <<
+<args; separator="\n">
+CALL <name>
 >>

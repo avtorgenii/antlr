@@ -37,8 +37,8 @@ public class Main {
 //        STGroup.trackCreationEvents = true;
 
         // Здесь мы выбираем "стратегию": генерировать стековый код или регистровый.
-        STGroup group = new STGroupFile("src/compiler/stack.stg");
-//        STGroup group = new STGroupFile("src/compiler/register.stg");
+//        STGroup group = new STGroupFile("src/compiler/stack.stg");
+        STGroup group = new STGroupFile("src/compiler/register.stg");
 
         EmitVisitor em = new EmitVisitor(group);
 
